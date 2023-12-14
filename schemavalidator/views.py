@@ -1,9 +1,11 @@
 import csv
 
-import openai
 from decouple import config
+from openai import OpenAI
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+client = OpenAI(api_key=config("OPENAI_KEY"))
 
 
 class ValidateSchemaView(APIView):
@@ -21,12 +23,7 @@ class ValidateSchemaView(APIView):
 
 
 def request_ai(message):
-    openai.api_key = config("OPENAI_KEY")
-    response = openai.Completion.create(
-        engine="text-davinci-003",  # Choose the appropriate engine
-        prompt=message,
-        max_tokens=100,  # Adjust based on your needs
-    )
+    response = client.completions.create(model="text-davinci-003", prompt=message, max_tokens=100)
     # format the response
     formatted_response = response.choices[0].text.strip()
     return formatted_response
